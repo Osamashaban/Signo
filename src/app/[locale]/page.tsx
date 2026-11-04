@@ -30,7 +30,7 @@ export default async function ComingSoonPage({ params }: PageProps<"/[locale]">)
           lang={otherLocale}
           hrefLang={otherLocale}
           data-testid="other-language"
-          className="flex h-10 items-center rounded-[10px] border border-line bg-surface px-3.5 text-sm font-semibold text-ink no-underline"
+          className="flex h-[42px] items-center rounded-[10px] border border-line bg-surface px-3.5 text-sm font-semibold text-ink no-underline"
         >
           {t("otherLang")}
         </Link>
