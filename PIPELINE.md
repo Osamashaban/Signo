@@ -9,7 +9,7 @@ It is the same pipeline as Ossama's OmniRent project, adapted to Signo's
 stack and to working by tickets. The database is Neon, as in OmniRent (D31).
 
 Two partners build Signo: **Ossama** and **Mostafa** (product owner, tests
-every ticket). Both ship to the same production. This file is the one copy of
+every ticket). Ossama approves every release to production (D39). This file is the one copy of
 the process, so every Claude reads the same thing.
 
 ---
@@ -96,12 +96,11 @@ visible in it and update it as each step finishes.
     (including Arabic and phone) **and says "looks good".**
 12. **Add the design to Figma.** Add the screens as approved on staging to the
     Figma file "Signo Feature Designs" (link in `PROJECT-STATE.md`), one page
-    per ticket, and share the Figma link in the thread. Then ask for the
-    second approval (below).
-13. **Wait for the other partner's approval on GitHub, take the production
-    lock, then migrate production.** Nothing touches production until the
-    other partner has approved the pull request on GitHub. Then see "One
-    release at a time". If the ticket has a migration, ask the requester to
+    per ticket, and share the Figma link in the thread.
+13. **Check Ossama's approval, take the production lock, then migrate
+    production.** Nothing touches production until Ossama has approved the
+    release (see "Approval for production" below). Then see "One release at
+    a time". If the ticket has a migration, ask the requester to
     run **Migrate production database** from `main`'s Actions tab with the
     phrase `apply to production` (the workflow backs up production first), or
     run it yourself if they tell you to. This happens BEFORE the code goes
@@ -191,24 +190,24 @@ and development). Tests in CI never touch either.
   changing anything, and Neon keeps 6 hours of history on top. Restoring
   either overwrites live data: stop and ask first.
 
-### Second approval for production
+### Approval for production
 
-Every release to production needs two approvals: the requester's ("deploy"
-and "looks good"), then the other partner's.
+Ossama approves every release to production (D39, 4 Nov 2026). Mostafa can
+view the production and staging sites but does not approve releases.
 
-- **Ask.** After "looks good", send the requester the pull request link to
-  pass to the other partner, with one sentence on what the ticket does.
-- **Approve.** The other partner opens the link and taps **Review changes ->
-  Approve** on GitHub. They do not need to read the code; the description
-  says what changed and how to check it. If they ask for changes, make them,
-  go back through staging, and ask again.
-- **Check before touching production.** Before step 13, read the pull
-  request's reviews on GitHub. Continue only if the other partner (not the
-  requester) has approved it, and no commit has been pushed since that
-  approval. A word in chat, a relayed message or "he approved" is not an
-  approval.
-- GitHub does not let anyone approve a pull request opened under their own
-  account, which is another reason the approval comes from the other partner.
+- **Ossama's "looks good" is the production approval.** When Ossama is the
+  requester, his "deploy" and "looks good" in the thread are all that is
+  needed; after step 12, go on to step 13.
+- **When Mostafa is the requester,** his "looks good" approves staging only.
+  After step 12, send Ossama the pull request link with one sentence on what
+  the ticket does, and wait for Ossama to write "looks good" (or "ship it")
+  in the thread before step 13.
+- **Check before touching production.** The approval must be Ossama's own
+  words in the thread, or his tap on a decision card. A relayed message or
+  "he approved" is not an approval. If any commit is pushed after his
+  approval, he checks staging again and approves again.
+- GitHub cannot record Ossama's approval on a pull request opened under his
+  own account, so the approval lives in the thread, not on GitHub.
 
 ## Accounts each partner's Claude needs
 

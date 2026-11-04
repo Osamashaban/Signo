@@ -44,6 +44,7 @@ Every product decision, with its source. **Default** = chosen by Claude in the r
 | D36 | Changes D34: every account is Ossama's. The code moves to a new private repository `Osamashaban/signo` and a new Vercel project `signo` in team `osamas-team1`, next to the Neon project. Mostafa is invited to the repository only to give the second approval. Mostafa's repository and Vercel project are kept untouched and unused (Ossama) | 4 Nov 2026 |
 | D38 | Fresh start (Ossama, 4 Nov 2026): nothing moves from Mostafa's accounts. `Osamashaban/signo` starts with a new history: requirements docs, the pipeline and an app with no screens. Version numbers restart at 0.001. Mostafa's old repository, Vercel project and the Supabase project are no longer part of Signo | 4 Nov 2026 |
 | D37 | Only Claude Design pages marked "Ready for development", with no open questions, are brought into the pipeline. Drafts and half-finished pages are never built, not even partly (Ossama) | 4 Nov 2026 |
+| D39 | Changes D36 and the pipeline's second approval: Ossama alone approves releases to production. Mostafa gets view access to the production and staging sites only, and does not approve pull requests (Ossama, chosen on the V0 release) | 4 Nov 2026 |
 
 ## Technical decisions (requirements session)
 
