@@ -1,0 +1,531 @@
+<title>Signo Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
+<style>
+/* Layout: top bar + view switch; agency = client list -> monthly post grid with side editor; client = single-column Instagram feed with approve/changes under each post */
+:root{
+  --bg:#F3F5F3; --surface:#FFFFFF; --ink:#15201D; --muted:#5E6B67; --line:#DCE2DF;
+  --accent:#0F5E52; --accent-ink:#FFFFFF; --accent-soft:#E2EFEC;
+  --pend:#9A6416; --pend-bg:#FBF0DA; --ok:#2B7449; --ok-bg:#E1F1E6;
+  --chg:#A9442C; --chg-bg:#F8E5DF; --draft:#5F6965; --draft-bg:#E9ECEA;
+  --display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1514; --surface:#18201E; --ink:#E6ECE9; --muted:#9BA7A3; --line:#2A3431;
+  --accent:#53B9A5; --accent-ink:#06201A; --accent-soft:#18332D;
+  --pend:#E5B866; --pend-bg:#382D16; --ok:#72C595; --ok-bg:#16301F;
+  --chg:#EC8E76; --chg-bg:#3A1F18; --draft:#A5AEAA; --draft-bg:#252E2B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1514; --surface:#18201E; --ink:#E6ECE9; --muted:#9BA7A3; --line:#2A3431;
+  --accent:#53B9A5; --accent-ink:#06201A; --accent-soft:#18332D;
+  --pend:#E5B866; --pend-bg:#382D16; --ok:#72C595; --ok-bg:#16301F;
+  --chg:#EC8E76; --chg-bg:#3A1F18; --draft:#A5AEAA; --draft-bg:#252E2B; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.top-in{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.logo{font-family:var(--display);font-weight:700;font-size:19px;display:flex;align-items:center;gap:8px}
+.stamp{width:26px;height:26px;border-radius:50%;border:2px solid var(--accent);display:grid;place-items:center;color:var(--accent)}
+.proto{font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:99px;padding:2px 10px}
+.spacer{flex:1}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:3px}
+.seg button{border:0;background:none;padding:5px 14px;border-radius:99px;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:500}
+.lang{border:1px solid var(--line);background:none;border-radius:99px;padding:5px 12px;font-size:14px}
+.bell{position:relative;border:1px solid var(--line);background:none;border-radius:99px;padding:5px 12px;font-size:14px;display:flex;gap:6px;align-items:center}
+.badge{background:var(--chg);color:var(--surface);border-radius:99px;font-size:11px;min-width:18px;height:18px;display:inline-grid;place-items:center;padding:0 5px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:26px;font-weight:600} h2{font-size:19px;font-weight:600} h3{font-size:16px;font-weight:600}
+.muted{color:var(--muted)}
+.head{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;padding-block:28px 18px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:500;display:inline-flex;gap:6px;align-items:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.btn.ghost{background:none}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;border-radius:99px;padding:2px 10px;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-draft{color:var(--draft);background:var(--draft-bg)} .s-pending{color:var(--pend);background:var(--pend-bg)}
+.s-approved{color:var(--ok);background:var(--ok-bg)} .s-changes{color:var(--chg);background:var(--chg-bg)}
+.clients{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:start;display:flex;flex-direction:column;gap:12px;width:100%}
+.ccard:hover{border-color:var(--accent)}
+.crow{display:flex;gap:10px;align-items:center}
+.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:600;color:#fff;flex:none}
+.counts{display:flex;flex-wrap:wrap;gap:6px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.pcard.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.thumb{aspect-ratio:1/1;max-width:100%;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:600;font-size:20px;text-align:center;padding:14px;position:relative}
+.thumb .multi{position:absolute;top:8px;inset-inline-end:8px;background:rgba(0,0,0,.45);font-size:11px;font-family:var(--body);padding:1px 8px;border-radius:99px}
+.pbody{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.pmeta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.cap{font-size:13.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.9em}
+.fb{font-size:13px;background:var(--chg-bg);color:var(--chg);border-radius:6px;padding:6px 8px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;position:sticky;top:76px}
+.panel textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--bg);resize:vertical}
+.linkbox{display:flex;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 6px 6px 10px;font-size:13px;direction:ltr}
+.linkbox code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,Menlo,monospace}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+.log li{display:flex;gap:8px}
+.log time{color:var(--muted);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex:none}
+.sumbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));inset-inline-start:50%;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:99px;font-size:14px;z-index:20}
+[dir="rtl"] .toast{transform:translateX(50%)}
+/* client review */
+.review{max-width:520px;margin:0 auto}
+.rhead{padding-block:24px 14px;display:flex;flex-direction:column;gap:10px}
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .3s}
+.ig{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:18px;overflow:hidden}
+.ig-top{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.ig-top .avatar{width:32px;height:32px;font-size:13px}
+.ig-handle{font-weight:600;font-size:14px;direction:ltr}
+.ig-img{position:relative}
+.ig-img .thumb{font-size:26px}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:#111;display:grid;place-items:center}
+.nav.prev{left:8px} .nav.next{right:8px}
+.dots{display:flex;justify-content:center;gap:4px;padding-top:8px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line)} .dots i.on{background:var(--accent)}
+.ig-actions{display:flex;gap:14px;padding:8px 12px 2px}
+.ig-actions svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.8}
+.ig-actions .save{margin-inline-start:auto}
+.ig-cap{padding:4px 12px 10px;font-size:14px;white-space:pre-wrap}
+.ig-date{padding:0 12px 10px;font-size:12px;color:var(--muted)}
+.decide{border-top:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.decide .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.decide textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface)}
+.err{color:var(--chg);font-size:13px}
+.namecard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;margin-top:40px;display:flex;flex-direction:column;gap:12px}
+.namecard input{border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--bg)}
+.done{background:var(--ok-bg);color:var(--ok);border-radius:var(--r);padding:14px;text-align:center;font-weight:500;margin-bottom:18px}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+.field input{border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg);font-size:15px;color:var(--ink);width:100%}
+.panel .field textarea{min-height:120px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;padding-top:4px}
+.swatches label{width:30px;height:30px;border-radius:50%;cursor:pointer;display:grid;place-items:center}
+.swatches input{position:absolute;opacity:0;pointer-events:none}
+.swatches input:checked + span{width:12px;height:12px;border-radius:50%;background:#fff}
+.swatches input:focus-visible + span{outline:2px solid #fff}
+.strip{display:flex;gap:6px;flex-wrap:wrap}
+.strip img{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:32px 16px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app"></div>
+
+<script>
+const T = {
+  en:{agency:"Agency",client:"Client view",proto:"Prototype · sample data",clients:"Clients",clientsSub:"Pick a client to manage this month's content plan.",
+    month:"November 2026",draft:"Draft",pending:"Awaiting approval",approved:"Approved",changes:"Needs changes",
+    send:"Send for approval",link:"Review link",copy:"Copy",copied:"Link copied",wa:"Send on WhatsApp",openClient:"Open as client",
+    edit:"Edit",save:"Save changes",cancel:"Cancel",caption:"Caption",newPost:"New post",activity:"Activity",noActivity:"No activity yet.",
+    posts:"posts",back:"All clients",updates:"Updates",feedback:"Client feedback",editorHint:"Select a post to edit it. Saving a post that needs changes sends it back for approval.",
+    sendTitle:"Send this month's plan",sendHint:"The client opens the link, no login needed, and approves each post.",
+    nothing:"No draft or edited posts to send.",sentToast:n=>`Sent ${n} posts for approval`,
+    name:"Before you start, enter your name",nameHint:"Your name is saved with each approval so the agency has a record.",namePh:"Your name",start:"Start review",nameErr:"Enter your name first",
+    reviewTitle:c=>`${c}: November content plan`,reviewing:"Reviewing as",progress:(a,n)=>`${a} of ${n} approved`,
+    approve:"Approve",request:"Request changes",submit:"Send feedback",commentPh:"What should change? e.g. use the new logo, shorten the caption…",emptyErr:"Write what needs to change first",
+    approveAll:"Approve all remaining",allDone:"All posts are approved. Thanks!",waitingAgency:"The agency is updating this post.",
+    approvedBy:w=>`Approved by ${w}`,
+    logSent:n=>`Agency sent ${n} posts for approval`,logApproved:(w,p)=>`${w} approved “${p}”`,logChanges:(w,p)=>`${w} asked for changes on “${p}”`,logEdited:p=>`Agency edited “${p}” and sent it back`,logNew:p=>`Agency added “${p}”`,
+    newCaption:"New post — write the caption here",waMsg:(c,l)=>`Hi ${c} team, your November content plan is ready for review: ${l}`,
+    slide:"Slide",version:v=>`Version ${v}`,
+    addClient:"New client",clientName:"Client name",handle:"Instagram handle",phone:"WhatsApp number (with country code)",color:"Brand color",saveClient:"Add client",
+    errName:"Enter the client name",errPhone:"Enter a valid WhatsApp number with country code, e.g. 201001234567",clientAdded:"Client added",
+    pubDate:"Publish date",images:"Images (up to 10; more than one makes a carousel)",replaceImgs:"Replace images (optional)",saveDraft:"Save as draft",
+    errImgs:"Add at least one image",errCap:"Write the caption",errDate:"Pick a publish date",emptyPlan:"No posts yet. Add the first post for this month.",postAdded:"Post saved as draft"},
+  ar:{agency:"الوكالة",client:"عرض العميل",proto:"نموذج أولي · بيانات تجريبية",clients:"العملاء",clientsSub:"اختار عميل علشان تدير خطة محتوى الشهر.",
+    month:"نوفمبر 2026",draft:"مسودة",pending:"في انتظار الموافقة",approved:"تمت الموافقة",changes:"محتاج تعديل",
+    send:"إرسال للموافقة",link:"لينك المراجعة",copy:"نسخ",copied:"اتنسخ اللينك",wa:"إرسال على واتساب",openClient:"افتح كعميل",
+    edit:"تعديل",save:"حفظ التعديلات",cancel:"إلغاء",caption:"الكابشن",newPost:"بوست جديد",activity:"النشاط",noActivity:"مفيش نشاط لسه.",
+    posts:"بوست",back:"كل العملاء",updates:"التحديثات",feedback:"تعليق العميل",editorHint:"اختار بوست علشان تعدله. لما تحفظ بوست محتاج تعديل، بيرجع للعميل يوافق عليه تاني.",
+    sendTitle:"إرسال خطة الشهر",sendHint:"العميل بيفتح اللينك من غير login، ويوافق على كل بوست.",
+    nothing:"مفيش بوستات مسودة أو متعدلة تتبعت.",sentToast:n=>`اتبعت ${n} بوست للموافقة`,
+    name:"قبل ما تبدأ، اكتب اسمك",nameHint:"اسمك بيتسجل مع كل موافقة، علشان الوكالة يبقى عندها سجل.",namePh:"اسمك",start:"ابدأ المراجعة",nameErr:"اكتب اسمك الأول",
+    reviewTitle:c=>`${c}: خطة محتوى نوفمبر`,reviewing:"بتراجع باسم",progress:(a,n)=>`${a} من ${n} تمت الموافقة عليهم`,
+    approve:"موافق",request:"محتاج تعديل",submit:"إرسال التعليق",commentPh:"إيه اللي محتاج يتغير؟ مثلاً: استخدموا اللوجو الجديد، قصّروا الكابشن…",emptyErr:"اكتب التعديل المطلوب الأول",
+    approveAll:"موافقة على الباقي كله",allDone:"كل البوستات اتوافق عليها. شكراً!",waitingAgency:"الوكالة بتعدل البوست ده.",
+    approvedBy:w=>`وافق عليه ${w}`,
+    logSent:n=>`الوكالة بعتت ${n} بوست للموافقة`,logApproved:(w,p)=>`${w} وافق على «${p}»`,logChanges:(w,p)=>`${w} طلب تعديل على «${p}»`,logEdited:p=>`الوكالة عدلت «${p}» وبعتته تاني`,logNew:p=>`الوكالة ضافت «${p}»`,
+    newCaption:"بوست جديد — اكتب الكابشن هنا",waMsg:(c,l)=>`أهلاً فريق ${c}، خطة محتوى نوفمبر جاهزة للمراجعة: ${l}`,
+    slide:"شريحة",version:v=>`نسخة ${v}`,
+    addClient:"عميل جديد",clientName:"اسم العميل",handle:"حساب انستجرام",phone:"رقم الواتساب (بكود الدولة)",color:"لون البراند",saveClient:"إضافة العميل",
+    errName:"اكتب اسم العميل",errPhone:"اكتب رقم واتساب صحيح بكود الدولة، مثلاً 201001234567",clientAdded:"اتضاف العميل",
+    pubDate:"تاريخ النشر",images:"الصور (لحد 10، وأكتر من صورة يبقى كاروسيل)",replaceImgs:"تغيير الصور (اختياري)",saveDraft:"حفظ كمسودة",
+    errImgs:"ضيف صورة واحدة على الأقل",errCap:"اكتب الكابشن",errDate:"اختار تاريخ النشر",emptyPlan:"مفيش بوستات لسه. ضيف أول بوست للشهر ده.",postAdded:"البوست اتحفظ كمسودة"}
+};
+
+const clients = [
+  {id:"brew",name:{en:"Brew Lab Café",ar:"بريو لاب كافيه"},handle:"brewlab.eg",color:"#7A4B2A",phone:"201001234567",slug:"brewlab-7Kq2"},
+  {id:"glow",name:{en:"Glow Clinic",ar:"جلو كلينك"},handle:"glowclinic.sa",color:"#B0577A",phone:"966501234567",slug:"glow-3Hx9"},
+  {id:"urban",name:{en:"Urban Steps",ar:"أوربان ستيبس"},handle:"urbansteps",color:"#2F5D8A",phone:"201112223334",slug:"urban-9Pz4"}
+];
+const tones = {brew:["#7A4B2A","#C08A4B","#3E2A1E"],glow:["#B0577A","#E2A0B6","#6D2E4A"],urban:["#2F5D8A","#5C8FC2","#1B3550"]};
+let uid = 100;
+function P(clientId,date,caption,slides,status,extra={}){
+  return Object.assign({id:++uid,clientId,date,caption,slides,status,versions:1,feedback:null,approvedBy:null},extra);
+}
+const posts = [
+  P("brew","2026-11-03","قهوة الصبح عندنا غير ☕\nجرّب الـ V60 الجديد بحبوب إثيوبي، متوفر من النهارده.",["V60 إثيوبي"],"approved",{approvedBy:"سارة"}),
+  P("brew","2026-11-06","خصم 20% على كل المشروبات الباردة يوم الجمعة 🧊\n#بريو_لاب",["خصم 20%","الجمعة بس"],"changes",{feedback:"السعر في الشريحة التانية غلط، الخصم على المشروبات الباردة بس مش كله"}),
+  P("brew","2026-11-10","تعرّف على فريق الباريستا بتاعنا 👋\nكل واحد فيهم ليه طريقته في الـ latte art.",["فريقنا","أحمد","منة"],"pending"),
+  P("brew","2026-11-14","مكان هادي للشغل والمذاكرة، واي فاي سريع وبلاجات في كل ترابيزة.",["مساحة شغل"],"pending"),
+  P("brew","2026-11-18","كرواسون بالزعتر خارج من الفرن كل يوم الساعة 8 🥐",["كرواسون زعتر"],"draft"),
+  P("brew","2026-11-24","Black Friday في بريو لاب: اشتري 2 والتالت علينا.",["Black Friday","2 + 1"],"draft"),
+  P("glow","2026-11-04","ابتسامتك تستاهل ✨ احجزي استشارة تبييض مجانية الأسبوع ده.",["استشارة مجانية"],"approved",{approvedBy:"د. ريم"}),
+  P("glow","2026-11-09","نصايح للعناية بالبشرة في الشتا من دكاترة جلو.",["نصيحة 1","نصيحة 2","نصيحة 3"],"pending"),
+  P("glow","2026-11-15","فرعنا الجديد في جدة فتح أبوابه 🎉",["فرع جدة"],"pending"),
+  P("glow","2026-11-21","قبل وبعد: نتايج جلسات التقشير الكيميائي.",["قبل","بعد"],"draft"),
+  P("urban","2026-11-05","كولكشن الشتا وصل. مقاسات من 38 لـ 45.",["كولكشن الشتا"],"approved",{approvedBy:"Omar"}),
+  P("urban","2026-11-12","Free shipping on all orders above 1,500 EGP this week.",["Free shipping"],"approved",{approvedBy:"Omar"}),
+  P("urban","2026-11-19","اختار الكوتشي على حسب يومك 👟",["رياضي","كاجوال","رسمي"],"changes",{feedback:"Use the new product photos from the shoot, not the old ones."}),
+];
+const log = [
+  {at:"2026-11-01T10:05",clientId:"brew",type:"approved",who:"سارة",post:posts[0].id},
+  {at:"2026-11-01T10:12",clientId:"brew",type:"changes",who:"سارة",post:posts[1].id},
+  {at:"2026-11-01T09:40",clientId:"brew",type:"sent",n:4},
+];
+
+const S = {lang:"ar",view:"agency",clientId:null,editing:null,sendOpen:false,reviewClient:"brew",reviewer:null,openFb:{},fbErr:{},slide:{},toast:null,seen:log.length,nameErr:false,
+  addClient:false,clientErr:{},newPost:false,draft:null,editDraft:null,postErr:{}};
+const swatchColors = ["#7A4B2A","#B0577A","#2F5D8A","#2E6B4F","#8A3B2F","#5B4A8A","#B07A1F","#3A4A55"];
+const toneFor = id => tones[id] || [byId(id).color, byId(id).color, byId(id).color];
+function readImg(file){
+  return new Promise(res=>{
+    const fr = new FileReader();
+    fr.onload = ()=>{ const im = new Image();
+      im.onload = ()=>{ const sc = Math.min(1,1080/Math.max(im.width,im.height)); const c = document.createElement("canvas");
+        c.width = Math.round(im.width*sc); c.height = Math.round(im.height*sc); c.getContext("2d").drawImage(im,0,0,c.width,c.height); res(c.toDataURL("image/jpeg",.85)); };
+      im.onerror = ()=>res(null); im.src = fr.result; };
+    fr.onerror = ()=>res(null); fr.readAsDataURL(file);
+  });
+}
+
+const t = k => T[S.lang][k];
+const cname = c => c.name[S.lang];
+const byId = id => clients.find(c=>c.id===id);
+const esc = s => String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const short = p => { const s = p.caption.split("\n")[0]; return s.length>34 ? s.slice(0,34)+"…" : s; };
+const fmtDate = d => new Date(d+"T12:00").toLocaleDateString(S.lang==="ar"?"ar-EG":"en-GB",{weekday:"short",day:"numeric",month:"short"});
+const fmtTime = d => new Date(d).toLocaleString(S.lang==="ar"?"ar-EG":"en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const now = () => { const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); };
+const reviewLink = c => `https://signo.app/r/${c.slug}`;
+const statusPill = s => `<span class="pill s-${s}">${t(s)}</span>`;
+const countsFor = id => { const r={draft:0,pending:0,approved:0,changes:0}; posts.filter(p=>p.clientId===id).forEach(p=>r[p.status]++); return r; };
+const initials = c => cname(c).replace(/[^\p{L}\s]/gu,"").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("");
+
+function thumb(p, i=0, big=false){
+  const tone = toneFor(p.clientId)[i % 3], s = p.slides[i];
+  const multi = p.slides.length>1 && !big ? `<span class="multi">1/${p.slides.length}</span>` : "";
+  if(s && typeof s==="object") return `<div class="thumb" style="background:${tone}"><img src="${s.img}" alt="">${multi}</div>`;
+  return `<div class="thumb" style="background:${tone}"><span dir="auto">${esc(p.slides[i])}</span>${multi}</div>`;
+}
+function logText(e){
+  const p = posts.find(x=>x.id===e.post);
+  switch(e.type){
+    case "sent": return T[S.lang].logSent(e.n);
+    case "approved": return T[S.lang].logApproved(e.who, short(p));
+    case "changes": return T[S.lang].logChanges(e.who, short(p));
+    case "edited": return T[S.lang].logEdited(short(p));
+    case "new": return T[S.lang].logNew(short(p));
+  }
+}
+const dotColor = {sent:"var(--pend)",approved:"var(--ok)",changes:"var(--chg)",edited:"var(--accent)",new:"var(--draft)"};
+
+function topBar(){
+  const unread = log.length - S.seen;
+  return `<header class="top"><div class="top-in">
+    <div class="logo"><span class="stamp" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>${S.lang==="ar"?"سيجنو":"Signo"}</div>
+    <span class="proto">${t("proto")}</span>
+    <span class="spacer"></span>
+    <div class="seg" role="group">
+      <button data-a="view" data-v="agency" aria-pressed="${S.view==="agency"}">${t("agency")}</button>
+      <button data-a="view" data-v="client" aria-pressed="${S.view==="client"}">${t("client")}</button>
+    </div>
+    ${S.view==="agency" ? `<button class="bell" data-a="seen" aria-label="${t("updates")}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg>${unread>0?`<span class="badge">${unread}</span>`:""}</button>`:""}
+    <button class="lang" data-a="lang">${S.lang==="ar"?"English":"عربي"}</button>
+  </div></header>`;
+}
+
+function agencyHome(){
+  const E = S.clientErr;
+  const form = !S.addClient ? "" : `<div class="panel" style="position:static;margin-bottom:18px">
+    <h3>${t("addClient")}</h3>
+    <div class="fields">
+      <label class="field" for="cName">${t("clientName")}<input id="cName" dir="auto"></label>
+      <label class="field" for="cHandle">${t("handle")}<input id="cHandle" dir="ltr" placeholder="@brand"></label>
+      <label class="field" for="cPhone">${t("phone")}<input id="cPhone" dir="ltr" inputmode="tel" placeholder="201001234567"></label>
+      <div class="field">${t("color")}<div class="swatches">${swatchColors.map((c,i)=>`<label style="background:${c}"><input type="radio" name="cColor" value="${c}" ${i===3?"checked":""} aria-label="${c}"><span></span></label>`).join("")}</div></div>
+    </div>
+    ${E.name?`<div class="err">${t("errName")}</div>`:""}${E.phone?`<div class="err">${t("errPhone")}</div>`:""}
+    <div style="display:flex;gap:8px"><button class="btn primary" data-a="saveClient">${t("saveClient")}</button><button class="btn ghost" data-a="cancelClient">${t("cancel")}</button></div>
+  </div>`;
+  return `<div class="head"><div><h1>${t("clients")}</h1><p class="muted" style="margin:4px 0 0">${t("clientsSub")}</p></div>
+    <div style="display:flex;gap:12px;align-items:center"><span class="muted">${t("month")}</span>${S.addClient?"":`<button class="btn primary" data-a="addClient">+ ${t("addClient")}</button>`}</div></div>
+  ${form}
+  <div class="clients">${clients.map(c=>{
+    const k = countsFor(c.id), total = Object.values(k).reduce((a,b)=>a+b,0);
+    return `<button class="ccard" data-a="open" data-id="${c.id}">
+      <div class="crow"><span class="avatar" style="background:${c.color}">${initials(c)}</span>
+        <div><h3>${esc(cname(c))}</h3><div class="muted" style="font-size:13px;direction:ltr;text-align:start">@${c.handle} · ${total} ${t("posts")}</div></div></div>
+      <div class="counts">${["approved","pending","changes","draft"].filter(s=>k[s]).map(s=>`<span class="pill s-${s}">${k[s]} ${t(s)}</span>`).join("")}</div>
+    </button>`;}).join("")}</div>
+  <div class="panel" style="margin-top:28px;position:static">${activityList(log)}</div>`;
+}
+
+function activityList(entries){
+  const list = [...entries].sort((a,b)=>b.at.localeCompare(a.at)).slice(0,8);
+  return `<h3>${t("activity")}</h3>${list.length?`<ul class="log">${list.map(e=>`<li><span class="dot" style="background:${dotColor[e.type]}"></span><div><div>${S.view==="agency"&&!S.clientId?`<b>${esc(cname(byId(e.clientId)))}</b> · `:""}${esc(logText(e))}</div><time>${fmtTime(e.at)}</time></div></li>`).join("")}</ul>`:`<p class="muted" style="margin:0">${t("noActivity")}</p>`}`;
+}
+
+function agencyPlan(){
+  const c = byId(S.clientId), list = posts.filter(p=>p.clientId===c.id).sort((a,b)=>a.date.localeCompare(b.date));
+  const k = countsFor(c.id), toSend = list.filter(p=>p.status==="draft").length;
+  const ed = list.find(p=>p.id===S.editing);
+  const link = reviewLink(c), wa = `https://wa.me/${c.phone}?text=${encodeURIComponent(T[S.lang].waMsg(cname(c),link))}`;
+  let side;
+  if(S.sendOpen){
+    side = `<h3>${t("sendTitle")}</h3><p class="muted" style="margin:0;font-size:14px">${t("sendHint")}</p>
+      <label class="muted" style="font-size:13px">${t("link")}</label>
+      <div class="linkbox"><code>${link}</code><button class="btn" data-a="copy" data-l="${link}">${t("copy")}</button></div>
+      <a class="btn ok" href="${wa}" target="_blank" rel="noopener" style="justify-content:center;text-decoration:none">${t("wa")}</a>
+      <div class="muted" style="font-size:12.5px;direction:ltr;text-align:start">+${c.phone}</div>
+      <button class="btn" data-a="asClient" data-id="${c.id}" style="justify-content:center">${t("openClient")}</button>
+      <button class="btn ghost" data-a="closeSend">${t("cancel")}</button>`;
+  } else if(S.newPost){
+    const d = S.draft, E = S.postErr;
+    side = `<h3>${t("newPost")}</h3>
+      <label class="field" for="pDate">${t("pubDate")}<input type="date" id="pDate" value="${d.date}" min="2026-11-01" max="2026-11-30"></label>
+      ${E.date?`<div class="err">${t("errDate")}</div>`:""}
+      <label class="field" for="pImgs">${t("images")}<input type="file" id="pImgs" accept="image/*" multiple></label>
+      ${d.imgs.length?`<div class="strip">${d.imgs.map(s=>`<img src="${s}" alt="">`).join("")}</div>`:""}
+      ${E.imgs?`<div class="err">${t("errImgs")}</div>`:""}
+      <label class="field" for="pCap">${t("caption")}<textarea id="pCap" dir="auto">${esc(d.cap)}</textarea></label>
+      ${E.cap?`<div class="err">${t("errCap")}</div>`:""}
+      <div style="display:flex;gap:8px"><button class="btn primary" data-a="savePost">${t("saveDraft")}</button><button class="btn ghost" data-a="cancelPost">${t("cancel")}</button></div>`;
+  } else if(ed){
+    const ex = S.editDraft;
+    side = `<div class="pmeta"><h3>${t("edit")}</h3>${statusPill(ed.status)}</div>
+      ${ex.imgs ? `<div class="strip">${ex.imgs.map(s=>`<img src="${s}" alt="">`).join("")}</div>` : thumb(ed)}
+      ${ed.feedback && ed.status==="changes" ? `<div class="fb"><b>${t("feedback")}:</b> ${esc(ed.feedback)}</div>`:""}
+      <label class="field" for="eDate">${t("pubDate")}<input type="date" id="eDate" value="${ex.date}" min="2026-11-01" max="2026-11-30"></label>
+      <label class="field" for="eImgs">${t("replaceImgs")}<input type="file" id="eImgs" accept="image/*" multiple></label>
+      <label for="cap" class="muted" style="font-size:13px">${t("caption")} · ${T[S.lang].version(ed.versions)}</label>
+      <textarea id="cap" dir="auto">${esc(ex.cap)}</textarea>
+      <div style="display:flex;gap:8px"><button class="btn primary" data-a="save">${t("save")}</button><button class="btn ghost" data-a="closeEdit">${t("cancel")}</button></div>`;
+  } else {
+    side = `<p class="muted" style="margin:0;font-size:14px">${t("editorHint")}</p><hr style="border:0;border-top:1px solid var(--line);width:100%;margin:4px 0">${activityList(log.filter(e=>e.clientId===c.id))}`;
+  }
+  return `<div class="head"><div>
+      <button class="btn ghost" data-a="home" style="padding:4px 0;border:0;margin-bottom:8px">${S.lang==="ar"?"→":"←"} ${t("back")}</button>
+      <div class="crow"><span class="avatar" style="background:${c.color}">${initials(c)}</span><div><h1>${esc(cname(c))}</h1><div class="muted">${t("month")}</div></div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-a="new">+ ${t("newPost")}</button><button class="btn primary" data-a="send">${t("send")}${toSend?` (${toSend})`:""}</button></div></div>
+  <div class="sumbar">${["approved","pending","changes","draft"].map(s=>`<span class="pill s-${s}">${k[s]} ${t(s)}</span>`).join("")}</div>
+  <div class="layout">${!list.length?`<div class="empty"><p style="margin:0">${t("emptyPlan")}</p><button class="btn primary" data-a="new">+ ${t("newPost")}</button></div>`:""}<div class="grid" ${list.length?"":"hidden"}>${list.map(p=>`
+    <article class="pcard ${p.id===S.editing?"sel":""}">
+      ${thumb(p)}
+      <div class="pbody">
+        <div class="pmeta"><span>${fmtDate(p.date)}</span>${statusPill(p.status)}</div>
+        <div class="cap" dir="auto">${esc(p.caption)}</div>
+        ${p.status==="changes"&&p.feedback?`<div class="fb" dir="auto">${esc(p.feedback)}</div>`:""}
+        ${p.status==="approved"&&p.approvedBy?`<div class="muted" style="font-size:12.5px">${esc(T[S.lang].approvedBy(p.approvedBy))}</div>`:""}
+        <button class="btn" data-a="edit" data-id="${p.id}" style="margin-top:auto;justify-content:center">${t("edit")}</button>
+      </div>
+    </article>`).join("")}</div>
+    <aside class="panel">${side}</aside></div>`;
+}
+
+const icons = `<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0112 6a5 5 0 019.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg><svg viewBox="0 0 24 24"><path d="M21 12a8.5 8.5 0 01-12.5 7.5L3 21l1.5-5.5A8.5 8.5 0 1121 12z"/></svg><svg viewBox="0 0 24 24"><path d="M22 3L11 13M22 3l-7 18-4-8-8-4z"/></svg><svg class="save" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>`;
+
+function clientView(){
+  const c = byId(S.reviewClient);
+  if(!S.reviewer){
+    return `<div class="review"><div class="namecard">
+      <div class="crow"><span class="avatar" style="background:${c.color}">${initials(c)}</span><h2>${esc(T[S.lang].reviewTitle(cname(c)))}</h2></div>
+      <label for="rname"><b>${t("name")}</b></label>
+      <p class="muted" style="margin:0;font-size:14px">${t("nameHint")}</p>
+      <input id="rname" placeholder="${t("namePh")}" autocomplete="name">
+      ${S.nameErr?`<div class="err">${t("nameErr")}</div>`:""}
+      <button class="btn primary" data-a="startReview" style="justify-content:center">${t("start")}</button>
+    </div></div>`;
+  }
+  const list = posts.filter(p=>p.clientId===c.id && p.status!=="draft").sort((a,b)=>a.date.localeCompare(b.date));
+  const ok = list.filter(p=>p.status==="approved").length, left = list.filter(p=>p.status==="pending").length;
+  return `<div class="review">
+    <div class="rhead">
+      <h1 style="font-size:22px">${esc(T[S.lang].reviewTitle(cname(c)))}</h1>
+      <div class="muted" style="font-size:14px">${t("reviewing")} <b>${esc(S.reviewer)}</b></div>
+      <div class="progress"><span style="width:${list.length?ok/list.length*100:0}%"></span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:14px">${T[S.lang].progress(ok,list.length)}</span>
+        ${left?`<button class="btn ok" data-a="approveAll">${t("approveAll")}</button>`:""}
+      </div>
+    </div>
+    ${list.length && ok===list.length ? `<div class="done">${t("allDone")}</div>`:""}
+    ${list.map(p=>igPost(c,p)).join("")}
+  </div>`;
+}
+
+function igPost(c,p){
+  const i = S.slide[p.id]||0, n = p.slides.length;
+  let decide;
+  if(p.status==="pending"){
+    decide = S.openFb[p.id]
+      ? `<label for="fb${p.id}" style="font-size:14px;font-weight:500">${t("request")}</label>
+         <textarea id="fb${p.id}" dir="auto" placeholder="${t("commentPh")}" data-a="fbInput" data-id="${p.id}"></textarea>
+         ${S.fbErr[p.id]?`<div class="err">${t("emptyErr")}</div>`:""}
+         <div class="row"><button class="btn primary" data-a="sendFb" data-id="${p.id}">${t("submit")}</button><button class="btn ghost" data-a="closeFb" data-id="${p.id}">${t("cancel")}</button></div>`
+      : `<div class="row"><button class="btn ok" data-a="approve" data-id="${p.id}">✓ ${t("approve")}</button><button class="btn" data-a="openFb" data-id="${p.id}">${t("request")}</button><span class="spacer"></span>${statusPill(p.status)}</div>`;
+  } else if(p.status==="approved"){
+    decide = `<div class="row">${statusPill("approved")}<span class="muted" style="font-size:13px">${esc(T[S.lang].approvedBy(p.approvedBy||""))}</span></div>`;
+  } else {
+    decide = `<div class="row">${statusPill("changes")}<span class="muted" style="font-size:13px">${t("waitingAgency")}</span></div>${p.feedback?`<div class="fb" dir="auto">${esc(p.feedback)}</div>`:""}`;
+  }
+  return `<article class="ig">
+    <div class="ig-top"><span class="avatar" style="background:${c.color}">${initials(c)}</span><span class="ig-handle">${c.handle}</span><span class="spacer"></span><span class="muted" style="font-size:12px">${fmtDate(p.date)}</span></div>
+    <div class="ig-img">${thumb(p,i,true)}
+      ${n>1&&i>0?`<button class="nav prev" data-a="slide" data-id="${p.id}" data-d="-1" aria-label="prev">‹</button>`:""}
+      ${n>1&&i<n-1?`<button class="nav next" data-a="slide" data-id="${p.id}" data-d="1" aria-label="next">›</button>`:""}
+    </div>
+    ${n>1?`<div class="dots">${p.slides.map((_,j)=>`<i class="${j===i?"on":""}"></i>`).join("")}</div>`:""}
+    <div class="ig-actions" aria-hidden="true">${icons}</div>
+    <div class="ig-cap" dir="auto"><b style="direction:ltr;unicode-bidi:isolate">${c.handle}</b> ${esc(p.caption)}</div>
+    <div class="decide">${decide}</div>
+  </article>`;
+}
+
+function render(){
+  document.documentElement.lang = S.lang;
+  document.documentElement.dir = S.lang==="ar"?"rtl":"ltr";
+  const main = S.view==="client" ? clientView() : (S.clientId ? agencyPlan() : agencyHome());
+  document.getElementById("app").innerHTML = topBar() + `<main class="wrap">${main}</main>` + (S.toast?`<div class="toast" role="status">${esc(S.toast)}</div>`:"");
+}
+function toast(msg){ S.toast=msg; render(); clearTimeout(toast.t); toast.t=setTimeout(()=>{S.toast=null;render();},2200); }
+
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-a]"); if(!b) return;
+  const a = b.dataset.a, id = +b.dataset.id || b.dataset.id;
+  const p = posts.find(x=>x.id===id);
+  switch(a){
+    case "lang": S.lang = S.lang==="ar"?"en":"ar"; break;
+    case "view": S.view = b.dataset.v; window.scrollTo(0,0); break;
+    case "seen": S.seen = log.length; break;
+    case "open": S.clientId=id; S.editing=null; S.sendOpen=false; S.newPost=false; window.scrollTo(0,0); break;
+    case "home": S.clientId=null; S.editing=null; S.sendOpen=false; S.newPost=false; break;
+    case "addClient": S.addClient=true; S.clientErr={}; render(); document.getElementById("cName")?.focus(); return;
+    case "cancelClient": S.addClient=false; S.clientErr={}; break;
+    case "saveClient": {
+      const name = document.getElementById("cName").value.trim();
+      const handle = document.getElementById("cHandle").value.trim().replace(/^@/,"") || name.toLowerCase().replace(/[^a-z0-9]+/g,"") || "brand";
+      const phone = document.getElementById("cPhone").value.replace(/\D/g,"");
+      const color = document.querySelector('input[name="cColor"]:checked')?.value || swatchColors[0];
+      S.clientErr = {name:!name, phone:!/^\d{10,15}$/.test(phone)};
+      if(S.clientErr.name || S.clientErr.phone){
+        const keep = {name, handle:document.getElementById("cHandle").value, phone:document.getElementById("cPhone").value, color};
+        render();
+        document.getElementById("cName").value=keep.name; document.getElementById("cHandle").value=keep.handle; document.getElementById("cPhone").value=keep.phone;
+        const r=document.querySelector(`input[name="cColor"][value="${keep.color}"]`); if(r) r.checked=true;
+        return;
+      }
+      const nid = "c"+Date.now();
+      clients.push({id:nid,name:{en:name,ar:name},handle,color,phone,slug:handle.slice(0,10)+"-"+Math.random().toString(36).slice(2,6)});
+      S.addClient=false; S.clientErr={}; S.clientId=nid; S.editing=null; S.sendOpen=false; S.newPost=false;
+      window.scrollTo(0,0); toast(t("clientAdded")); return;
+    }
+    case "edit": S.editing=id; S.sendOpen=false; S.newPost=false; S.editDraft={date:p.date,cap:p.caption,imgs:null}; break;
+    case "closeEdit": S.editing=null; break;
+    case "save": {
+      const ed = posts.find(x=>x.id===S.editing), ex = S.editDraft;
+      const val = document.getElementById("cap").value.trim(), date = document.getElementById("eDate").value || ed.date;
+      const changed = (val && val!==ed.caption) || date!==ed.date || (ex.imgs && ex.imgs.length);
+      if(changed){
+        if(val) ed.caption=val; ed.date=date; if(ex.imgs && ex.imgs.length){ ed.slides=ex.imgs.map(img=>({img})); S.slide[ed.id]=0; }
+        ed.versions++;
+        if(ed.status==="changes"||ed.status==="approved"){ ed.status="pending"; ed.feedback=null; ed.approvedBy=null; log.push({at:now(),clientId:ed.clientId,type:"edited",post:ed.id}); S.seen=log.length; }
+      }
+      S.editing=null; S.editDraft=null; break;
+    }
+    case "new": S.newPost=true; S.editing=null; S.sendOpen=false; S.postErr={}; S.draft={date:"2026-11-28",cap:"",imgs:[]}; break;
+    case "cancelPost": S.newPost=false; S.draft=null; S.postErr={}; break;
+    case "savePost": {
+      const d = S.draft; d.cap = document.getElementById("pCap").value.trim(); d.date = document.getElementById("pDate").value;
+      S.postErr = {date:!d.date, imgs:!d.imgs.length, cap:!d.cap};
+      if(S.postErr.date||S.postErr.imgs||S.postErr.cap) break;
+      const np = P(S.clientId,d.date,d.cap,d.imgs.map(img=>({img})),"draft");
+      posts.push(np); log.push({at:now(),clientId:S.clientId,type:"new",post:np.id}); S.seen=log.length;
+      S.newPost=false; S.draft=null; S.postErr={}; toast(t("postAdded")); return;
+    }
+    case "send": {
+      const drafts = posts.filter(x=>x.clientId===S.clientId && x.status==="draft");
+      if(!drafts.length && !posts.some(x=>x.clientId===S.clientId && x.status==="pending")){ toast(t("nothing")); return; }
+      drafts.forEach(x=>x.status="pending");
+      if(drafts.length){ log.push({at:now(),clientId:S.clientId,type:"sent",n:drafts.length}); S.seen=log.length; }
+      S.sendOpen=true; S.editing=null;
+      if(drafts.length){ toast(T[S.lang].sentToast(drafts.length)); return; }
+      break;
+    }
+    case "closeSend": S.sendOpen=false; break;
+    case "copy": {
+      const l=b.dataset.l;
+      try{ navigator.clipboard.writeText(l).then(()=>toast(t("copied")),()=>selectLink(b)); }catch(_){ selectLink(b); }
+      return;
+    }
+    case "asClient": S.view="client"; S.reviewClient=id; window.scrollTo(0,0); break;
+    case "startReview": {
+      const v = document.getElementById("rname").value.trim();
+      if(!v){ S.nameErr=true; break; } S.reviewer=v; S.nameErr=false; break;
+    }
+    case "approve": p.status="approved"; p.approvedBy=S.reviewer; log.push({at:now(),clientId:p.clientId,type:"approved",who:S.reviewer,post:p.id}); break;
+    case "approveAll": posts.filter(x=>x.clientId===S.reviewClient&&x.status==="pending").forEach(x=>{x.status="approved";x.approvedBy=S.reviewer;log.push({at:now(),clientId:x.clientId,type:"approved",who:S.reviewer,post:x.id});}); break;
+    case "openFb": S.openFb[id]=true; render(); document.getElementById("fb"+id)?.focus(); return;
+    case "closeFb": S.openFb[id]=false; S.fbErr[id]=false; break;
+    case "sendFb": {
+      const v = document.getElementById("fb"+id).value.trim();
+      if(!v){ S.fbErr[id]=true; render(); document.getElementById("fb"+id)?.focus(); return; }
+      p.status="changes"; p.feedback=v; S.openFb[id]=false; S.fbErr[id]=false;
+      log.push({at:now(),clientId:p.clientId,type:"changes",who:S.reviewer,post:p.id}); break;
+    }
+    case "slide": S.slide[id]=Math.max(0,Math.min(p.slides.length-1,(S.slide[id]||0)+(+b.dataset.d))); break;
+    default: return;
+  }
+  render();
+});
+document.addEventListener("change", async e=>{
+  const id = e.target.id;
+  if(id!=="pImgs" && id!=="eImgs") return;
+  const files = [...e.target.files].slice(0,10);
+  if(!files.length) return;
+  const imgs = (await Promise.all(files.map(readImg))).filter(Boolean);
+  if(id==="pImgs" && S.draft){ S.draft.imgs = imgs; S.postErr.imgs = false; }
+  if(id==="eImgs" && S.editDraft){ S.editDraft.imgs = imgs; }
+  render();
+});
+document.addEventListener("input", e=>{
+  const id = e.target.id;
+  if(S.draft && id==="pCap") S.draft.cap = e.target.value;
+  if(S.draft && id==="pDate") S.draft.date = e.target.value;
+  if(S.editDraft && id==="cap") S.editDraft.cap = e.target.value;
+  if(S.editDraft && id==="eDate") S.editDraft.date = e.target.value;
+  if(e.target.dataset.a==="fbInput" && S.fbErr[e.target.dataset.id]){ S.fbErr[e.target.dataset.id]=false; e.target.nextElementSibling?.classList.contains("err") && e.target.nextElementSibling.remove(); }
+  if(e.target.id==="rname" && S.nameErr){ S.nameErr=false; document.querySelector(".namecard .err")?.remove(); }
+});
+document.addEventListener("keydown", e=>{ if(e.key==="Enter" && e.target.id==="rname"){ document.querySelector('[data-a="startReview"]').click(); }});
+function selectLink(b){ const code=b.parentElement.querySelector("code"); const r=document.createRange(); r.selectNodeContents(code); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+render();
+</script>

@@ -1,0 +1,94 @@
+# ---------------------------------------------------------------------------
+# Applies pending database migrations to PRODUCTION (Neon branch `main`).
+#
+# Deliberately manual. A migration can permanently destroy real customer data
+# and, unlike code, cannot be undone by redeploying an older version. So it
+# never runs on a merge or deploy: a person starts it from main and types a
+# confirmation phrase. Before changing anything it saves a full copy of the
+# database as a run artifact (kept 30 days). Neon also keeps 6 hours of
+# history that can be restored from the Neon console.
+#
+# How to run it: GitHub -> Actions -> "Migrate production database" ->
+# "Run workflow" (branch: main) -> type `apply to production`.
+#
+# Secret: PRODUCTION_DATABASE_URL_UNPOOLED (Neon `main`, direct connection).
+# See SETUP.md and PIPELINE.md, step 13.
+# ---------------------------------------------------------------------------
+name: Migrate production database
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type "apply to production" to confirm. Anything else fails the run.'
+        required: true
+        type: string
+
+concurrency:
+  group: migrate-production
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Back up, then apply migrations to production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    # GitHub Free has no environments with required reviewers on private
+    # repositories. On GitHub Pro or Team, create an environment named
+    # `production` with the other partner as a required reviewer and add
+    # `environment: production` here (see SETUP.md).
+    env:
+      DATABASE_URL_UNPOOLED: ${{ secrets.PRODUCTION_DATABASE_URL_UNPOOLED }}
+    steps:
+      - name: Check the confirmation phrase
+        if: ${{ inputs.confirmation != 'apply to production' }}
+        run: |
+          echo "::error::Confirmation phrase did not match. Expected exactly: apply to production"
+          exit 1
+
+      - name: Only from main
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: |
+          echo "::error::Run this workflow from the main branch only."
+          exit 1
+
+      - name: Check the secret is set
+        run: |
+          if [ -z "$DATABASE_URL_UNPOOLED" ]; then
+            echo "::error::Missing repository secret PRODUCTION_DATABASE_URL_UNPOOLED (see SETUP.md)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Show which migrations are pending
+        run: npm run db:migrate -- --dry-run
+
+      - name: Install the Postgres 18 backup tool
+        run: |
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-client-18
+
+      - name: Back up production
+        run: |
+          mkdir -p backup
+          /usr/lib/postgresql/18/bin/pg_dump "$DATABASE_URL_UNPOOLED" \
+            --format=custom --no-owner --no-privileges --file=backup/production.dump
+          ls -l backup
+
+      - name: Keep the backup with this run
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-backup-${{ github.run_number }}
+          path: backup/
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Apply pending migrations
+        run: npm run db:migrate
