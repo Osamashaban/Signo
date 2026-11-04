@@ -11,7 +11,17 @@ language, for people who do not read code.
 
 ---
 
-## 0.001 — (filled in at merge)
+## 0.002 — 2026-11-04
+
+V0, the first screen: a "Coming soon" page from the Claude Design canvas, in
+Arabic (the default, right to left) and English, on phones and computers,
+with a button to switch language. Every page now also carries security
+settings that stop other sites from showing it inside their own pages. From
+this release on, Ossama alone approves releases to production (D39).
+
+Commit: _recorded after merge_
+
+## 0.001 — 2026-11-04 19:55 UTC
 
 Fresh start on Ossama's accounts (D38). The project has the same pipeline as
 OmniRent: screens come only from the Claude Design canvas, every change is
@@ -20,4 +30,4 @@ partner's approval and a backed-up, hand-started database update. There are
 no screens yet. A status address (`/api/health`) shows which environment you
 are on and whether it reaches its database.
 
-Commit: _recorded after merge_
+Commit: `6331e1a` (pushed directly as the repository's first commit)
