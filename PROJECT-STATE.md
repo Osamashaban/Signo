@@ -15,7 +15,7 @@ Last updated: 2026-11-04.
 
 | Thing | Where |
 | --- | --- |
-| Repository | `Osamashaban/signo` (private; Ossama owns it, Mostafa is invited as a collaborator for second approvals) (D36) |
+| Repository | `Osamashaban/signo` (private; Ossama owns it and approves releases, D39) |
 | Hosting | Vercel project `signo`, team `osamas-team1` (Ossama's) |
 | Live site | Filled in after the first deployment (production, serves `main`) |
 | Staging | Fixed link that always shows the `staging` git branch (filled in after the first deployment); each pull request also gets its own preview link. All of them read the Neon `staging` database |
@@ -46,8 +46,8 @@ production database**). Set up by `SETUP.md`. Local development reads
 
 Changes reach `main` through a pull request, following `PIPELINE.md`
 (adopted 2026-11-04, decisions D30 and D31). The requester approves in chat ("deploy",
-"looks good"); the other partner approves the pull request on GitHub before
-anything touches production.
+"looks good"). Ossama approves every release to production (D39); Mostafa can
+view the production and staging sites but does not approve releases.
 
 ## Status
 
@@ -66,7 +66,6 @@ anything touches production.
   first ticket review.
 - Auth emails in Arabic and English need Resend with a verified domain (D32).
   The domain isn't bought yet.
-- GitHub Free does not enforce branch protection or required reviewers on
-  private repositories. Until the repository is on GitHub Pro, the "no merge
-  without the other partner's approval" rule is kept by the pipeline, not by
-  GitHub.
+- GitHub Free does not enforce branch protection on private repositories,
+  so the "nothing reaches production without Ossama's approval" rule is kept
+  by the pipeline, not by GitHub.
