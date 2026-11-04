@@ -1,41 +1,55 @@
 @import "tailwindcss";
 
-/* Design tokens from docs/06-design-brief.md. Final values come with the design pass. */
+/*
+ * Design tokens from the Claude Design canvas "Signo UI/UX project"
+ * (v0 page, light and dark themes). Light is the default.
+ */
 :root {
-  --background: #f6f7f4;
-  --foreground: #1b2421;
-  --muted: #55625d;
-  --accent: #0f5c5a;
-  --status-pending: #b7791f;
-  --status-approved: #2f7d4a;
-  --status-changes: #b5543c;
-  --status-draft: #6b7280;
+  --bg: #f4f6f3;
+  --sf: #ffffff;
+  --line: #dce2da;
+  --tx: #17201d;
+  --mu: #56625d;
+  --ac: #0f5e5a;
+  --acx: #ffffff;
+  --acs: #dcebe7;
+  --pb: #fbefd5;
+  --pi: #7a4e00;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #111715;
-    --foreground: #e7ece9;
-    --muted: #9aa8a2;
-    --accent: #5fc4bf;
+    --bg: #0f1514;
+    --sf: #161f1e;
+    --line: #2a3634;
+    --tx: #e6edea;
+    --mu: #9aa8a3;
+    --ac: #5cc1b5;
+    --acx: #05211f;
+    --acs: #15322f;
+    --pb: #3a2c0e;
+    --pi: #f0c264;
   }
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-pending: var(--status-pending);
-  --color-approved: var(--status-approved);
-  --color-changes: var(--status-changes);
-  --color-draft: var(--status-draft);
+  --color-bg: var(--bg);
+  --color-surface: var(--sf);
+  --color-line: var(--line);
+  --color-ink: var(--tx);
+  --color-muted: var(--mu);
+  --color-accent: var(--ac);
+  --color-on-accent: var(--acx);
+  --color-accent-soft: var(--acs);
+  --color-pending-bg: var(--pb);
+  --color-pending-ink: var(--pi);
   --font-sans: var(--font-plex-arabic), system-ui, sans-serif;
-  --font-heading: var(--font-readex), var(--font-plex-arabic), system-ui, sans-serif;
+  --font-heading: var(--font-readex), sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  margin: 0;
+  background: var(--bg);
+  color: var(--tx);
   font-family: var(--font-sans);
 }
