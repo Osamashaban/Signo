@@ -7,7 +7,7 @@ in `docs/04-decisions-log.md`) is lost.
 
 Keep it current. Correct it when reality changes rather than appending to it.
 
-Last updated: 2026-11-04.
+Last updated: 2026-11-05.
 
 ---
 
@@ -66,6 +66,16 @@ view the production and staging sites but does not approve releases.
   first ticket review.
 - Auth emails in Arabic and English need Resend with a verified domain (D32).
   The domain isn't bought yet.
-- GitHub Free does not enforce branch protection on private repositories,
-  so the "nothing reaches production without Ossama's approval" rule is kept
-  by the pipeline, not by GitHub.
+- GitHub Free does not enforce branch protection on private repositories.
+  Production is still gated: Vercel's automatic domain assignment for
+  production is off (5 Nov 2026, D40), so a merge to `main` builds
+  production but it only goes live when promoted after Ossama's approval.
+  Production migrations run only by hand (`Migrate production database`).
+- Production database backups: Neon Free keeps 6 hours of point-in-time
+  history (on) and allows no scheduled snapshots. Each production
+  migration also saves a full copy first (kept 30 days). Upgrade to Neon
+  Launch before the pilot for up to 7 days and daily snapshots (R2).
+- Mostafa's admin access (D40): Neon invite and GitHub collaborator are
+  Ossama's steps (`SETUP.md` step 3); Vercel needs Pro to add a member.
+- The Neon organization also has an admin `samerismaeil98@gmail.com`
+  (seen 5 Nov 2026). Ossama to confirm whether that is intended.

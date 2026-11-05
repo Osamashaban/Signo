@@ -75,6 +75,11 @@ Portability (D20): don't use Vercel-only features (for example Vercel KV, Vercel
 13. Soft-delete clients and deliverables (`archived_at`). No hard deletes from the UI.
 14. History is never overwritten: prices close their old row and add a new one; agency plan changes add a row; payments are voided, never edited or deleted; edits to clients, team roles and agency settings write old and new values to the activity log.
 
+### Ossama's standing rules (5 Nov 2026, D40)
+15. **Production is protected.** No deploy to production and no production database migration without Ossama's explicit approval in the thread (`PIPELINE.md`, "Approval for production"). Staging stays automatic. Vercel is set so a merge to `main` builds production but does not put it live: it goes live only when promoted after his approval.
+16. **Backups.** Point-in-time restore on the production database (Neon branch `main`) stays on. Report the current restore window when asked or when it changes (today 6 hours, Neon Free).
+17. **Never delete without asking.** No deleting data, tables, branches (git or Neon), projects, deployments or accounts without asking Ossama first and getting his yes. This includes "cleanup".
+
 ## Before any ticket: the setup check
 
 Confirm by doing, not asking: one small read-only call to each. If any fails, stop, tell the person in plain words what's missing and how to fix it, and wait.

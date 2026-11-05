@@ -69,15 +69,24 @@ The same name twice with different values is on purpose: that is what keeps
 previews off production data. Local development reads `.env.local` (see
 `.env.example`) and always points at `staging`.
 
-## Step 3 — Invite Mostafa and share the design files
+## Step 3 — Give Mostafa admin access and share the design files
 
-Mostafa owns no account in this setup, but he gives the second approval
-before anything reaches production (`PIPELINE.md`, "Second approval"):
+Mostafa gets admin rights everywhere so the business doesn't depend on one
+account (D40). He still doesn't approve releases: Ossama does (D39).
 
-1. GitHub → repository **signo** → **Settings** → **Collaborators** → **Add
-   people** → `MostafaMahmouddba`. He accepts the email invite.
-2. Share the Claude Design canvas "Signo UI/UX project" with Mostafa.
-3. Share the Figma file "Signo Feature Designs" with Mostafa:
+1. **Neon:** [console.neon.tech](https://console.neon.tech) → your
+   organization → **Settings** → **People** → **Invite** →
+   `mostafa200984@gmail.com`, role **Admin**.
+2. **GitHub:** repository **signo** → **Settings** → **Collaborators** →
+   **Add people** → `MostafaMahmouddba`. A repository on a personal account
+   can't have a second admin; for full admin rights, move it into a free
+   GitHub organization with both of you as owners (Claude does the
+   reconnecting afterwards).
+3. **Vercel:** team **osamas-team1** → **Settings** → **Members** → invite
+   `mostafa200984@gmail.com` as **Owner**. The free Hobby plan has one
+   member only, so this needs Vercel Pro (about $20 a month per member).
+4. Share the Claude Design canvas "Signo UI/UX project" with Mostafa.
+5. Share the Figma file "Signo Feature Designs" with Mostafa:
    https://www.figma.com/design/Fq9rBwsQQb7l5onf2UTmX3
 
 Then tell Claude "keys added". It runs the setup check in `CLAUDE.md` and

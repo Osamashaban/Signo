@@ -107,9 +107,13 @@ visible in it and update it as each step finishes.
     live, so the new code never meets an old database. Migrations must be
     additive (new tables or columns, nothing dropped or renamed) so the code
     still running in production keeps working against the new database.
-14. **Merge to `main`.** Bring the branch up to date with `main` first and
-    re-run the checks. Add the next entry to `VERSIONS.md`. Vercel then
-    deploys production. Confirm with the live link, then release the lock.
+14. **Merge to `main`, then promote.** Bring the branch up to date with
+    `main` first and re-run the checks. Add the next entry to `VERSIONS.md`.
+    Vercel then builds a production deployment but does **not** put it live
+    (automatic domain assignment is off, D40). Check once more that Ossama's
+    approval stands, then promote that deployment (Vercel → project `signo`
+    → Deployments → the new one → **Promote**). Confirm with the live link,
+    then release the lock. To undo, promote the previous deployment.
 15. **After-launch check.** Click through production, check the Vercel and
     Neon logs for errors over the next 24 hours, then post "all clear" or
     the problem in the thread. If you cannot read the logs, ask the requester
@@ -187,8 +191,11 @@ and development). Tests in CI never touch either.
   than yours while you worked, rename yours so it sorts after it.
 - Production: only through **Migrate production database**, from `main`,
   at step 13. It saves a backup as a run artifact (kept 30 days) before
-  changing anything, and Neon keeps 6 hours of history on top. Restoring
+  changing anything, and Neon keeps 6 hours of history on top (Neon Free;
+  the Launch plan keeps up to 7 days and adds daily snapshots). Restoring
   either overwrites live data: stop and ask first.
+- Never delete a table, column, row, Neon branch, git branch or project
+  without asking Ossama first (D40).
 
 ### Approval for production
 
@@ -202,6 +209,9 @@ view the production and staging sites but does not approve releases.
   After step 12, send Ossama the pull request link with one sentence on what
   the ticket does, and wait for Ossama to write "looks good" (or "ship it")
   in the thread before step 13.
+- **Nothing goes live by itself.** Merging to `main` builds production but
+  does not serve it; promotion and the production migration both need
+  Ossama's approval first (D40).
 - **Check before touching production.** The approval must be Ossama's own
   words in the thread, or his tap on a decision card. A relayed message or
   "he approved" is not an approval. If any commit is pushed after his
