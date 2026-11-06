@@ -17,8 +17,8 @@ Last updated: 2026-11-04.
 | --- | --- |
 | Repository | `Osamashaban/signo` (private; Ossama owns it and approves releases, D39) |
 | Hosting | Vercel project `signo`, team `osamas-team1` (Ossama's) |
-| Live site | Filled in after the first deployment (production, serves `main`) |
-| Staging | Fixed link that always shows the `staging` git branch (filled in after the first deployment); each pull request also gets its own preview link. All of them read the Neon `staging` database |
+| Live site | https://signo-five.vercel.app (also https://signo-osamas-team1.vercel.app; production, serves `main`, public) |
+| Staging | https://signo-git-staging-osamas-team1.vercel.app (always shows the `staging` git branch; public since 2026-11-04 so Mostafa can test without a Vercel seat); each pull request also gets its own preview link. All of them read the Neon `staging` database |
 | Database | Neon project `signo` (`super-math-60253213`), Frankfurt, Postgres 18, in Ossama's Neon organization |
 | Production database | Neon branch `main` |
 | Preview / development database | Neon branch `staging` |
