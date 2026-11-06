@@ -11,6 +11,17 @@ language, for people who do not read code.
 
 ---
 
+## 0.003 — 2026-11-06
+
+V0 wording update from the Claude Design canvas (re-confirmed ready by Ossama
+on 6 Nov). The Arabic is now simple Modern Standard Arabic, the headline
+matches the sign-up screens ("Get your clients' approval with one link."),
+the Arabic badge reads "قريبًا", the Arabic footer year uses Latin digits, and
+the English page's language button says "العربية". Approved by Ossama on
+staging (D39).
+
+Commit: _recorded after merge_
+
 ## 0.002 — 2026-11-04
 
 V0, the first screen: a "Coming soon" page from the Claude Design canvas, in
@@ -19,7 +30,7 @@ with a button to switch language. Every page now also carries security
 settings that stop other sites from showing it inside their own pages. From
 this release on, Ossama alone approves releases to production (D39).
 
-Commit: _recorded after merge_
+Commit: `35a663d`
 
 ## 0.001 — 2026-11-04 19:55 UTC
 
