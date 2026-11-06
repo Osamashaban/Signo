@@ -19,7 +19,7 @@ with a button to switch language. Every page now also carries security
 settings that stop other sites from showing it inside their own pages. From
 this release on, Ossama alone approves releases to production (D39).
 
-Commit: _recorded after merge_
+Commit: `35a663d`
 
 ## 0.001 — 2026-11-04 19:55 UTC
 
