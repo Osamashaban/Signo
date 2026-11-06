@@ -35,6 +35,15 @@ Frankfurt was chosen because it is the closest region to Cairo and the Gulf.
 | --- | --- | --- |
 | `DATABASE_URL` (pooled) | Neon `main` | Neon `staging` |
 | `DATABASE_URL_UNPOOLED` (direct) | Neon `main` | Neon `staging` |
+| `NEON_AUTH_BASE_URL` | Neon Auth of `main` | Neon Auth of `staging` |
+| `NEON_AUTH_COOKIE_SECRET` | its own random value | its own random value |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Resend | Resend (test sender until the domain is bought) |
+
+Neon Auth (US-SGN-001) is set up per branch: email and password on, login
+links 60 minutes with no sign-up through them, Google off, sessions ended on
+password reset, and a webhook for `send.magic_link` to `<site>/api/auth-webhook`
+so Signo sends login and reset emails itself. The webhook points at one
+address per branch: on staging it follows the pull request being tested.
 
 That split is what stops a preview writing to real agencies' data. GitHub
 Actions secrets: `STAGING_DATABASE_URL_UNPOOLED` (used by **Migrate staging
@@ -55,7 +64,8 @@ view the production and staging sites but does not approve releases.
 | --- | --- |
 | Fresh start (D38) | The repository started empty on 2026-11-04. Nothing was copied from earlier repositories or hosting |
 | Pipeline, Neon, health check, migrations | Live (0.001) |
-| US-SGN-001 onwards | Each waits for its Claude Design pages marked "Ready for development" (D35, D37) |
+| US-SGN-001 sign-up, login, workspace | On staging for review (PR #5). Neon Auth set up on `staging` only; `main` is set up at release |
+| US-SGN-002 onwards | Each waits for its Claude Design pages marked "Ready for development" (D35, D37) |
 
 ## Open
 

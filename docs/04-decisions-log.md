@@ -45,6 +45,13 @@ Every product decision, with its source. **Default** = chosen by Claude in the r
 | D38 | Fresh start (Ossama, 4 Nov 2026): nothing moves from Mostafa's accounts. `Osamashaban/signo` starts with a new history: requirements docs, the pipeline and an app with no screens. Version numbers restart at 0.001. Mostafa's old repository, Vercel project and the Supabase project are no longer part of Signo | 4 Nov 2026 |
 | D37 | Only Claude Design pages marked "Ready for development", with no open questions, are brought into the pipeline. Drafts and half-finished pages are never built, not even partly (Ossama) | 4 Nov 2026 |
 | D39 | Changes D36 and the pipeline's second approval: Ossama alone approves releases to production. Mostafa gets view access to the production and staging sites only, and does not approve pull requests (Ossama, chosen on the V0 release) | 4 Nov 2026 |
+| D40 | US-SGN-001 login runs on Neon Auth (D31), but Signo sends every auth email itself through Resend in the member's language: login and reset links come from Neon Auth's `send.magic_link` webhook; the email verification link is Signo's own (Neon's lasts only 15 minutes), so it can last 24 hours as designed (Ossama chose "24 hours, as designed", 6 Nov 2026) | 6 Nov 2026 |
+| D41 | Field errors show under the field with a red border, all at once: MSG-001-10 required, MSG-001-11 invalid email, MSG-001-12 name length (canvas D18) | 5 Nov 2026 |
+| D42 | "Resend email": 60-second cooldown, at most 5 an hour, a new link replaces the old one; MSG-001-13/14/15 (canvas D19) | 5 Nov 2026 |
+| D43 | The 15-minute lockout blocks password log-in and login links, not password reset; a reset clears it (canvas D20) | 5 Nov 2026 |
+| D44 | The verification link lasts 24 hours; an expired link shows MSG-001-08 with "Resend email". Expired login and reset links show the same message with "Request a new link" (canvas D21) | 5 Nov 2026 |
+| D45 | Screen titles and button labels for ticket 001 are the ones on the Claude Design page; Arabic copy is simple Modern Standard Arabic (canvas D22, D27) | 5 Nov 2026 |
+| D46 | After log-in, members land on a temporary clients page (logo, agency name, language switch, Log out, MSG-001-16) until US-SGN-003 replaces it (canvas D23) | 5 Nov 2026 |
 
 ## Technical decisions (requirements session)
 

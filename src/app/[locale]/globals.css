@@ -7,6 +7,7 @@
 :root {
   --bg: #f4f6f3;
   --sf: #ffffff;
+  --sf2: #ecefea;
   --line: #dce2da;
   --tx: #17201d;
   --mu: #56625d;
@@ -15,12 +16,17 @@
   --acs: #dcebe7;
   --pb: #fbefd5;
   --pi: #7a4e00;
+  --ob: #ddf0e2;
+  --oi: #1c6636;
+  --cb: #f8e1d8;
+  --ci: #963a21;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f1514;
     --sf: #161f1e;
+    --sf2: #1d2827;
     --line: #2a3634;
     --tx: #e6edea;
     --mu: #9aa8a3;
@@ -29,6 +35,10 @@
     --acs: #15322f;
     --pb: #3a2c0e;
     --pi: #f0c264;
+    --ob: #123120;
+    --oi: #82d59d;
+    --cb: #3b1e16;
+    --ci: #f1a189;
   }
 }
 
@@ -43,6 +53,11 @@
   --color-accent-soft: var(--acs);
   --color-pending-bg: var(--pb);
   --color-pending-ink: var(--pi);
+  --color-surface-2: var(--sf2);
+  --color-ok-bg: var(--ob);
+  --color-ok-ink: var(--oi);
+  --color-error-bg: var(--cb);
+  --color-error-ink: var(--ci);
   --font-sans: var(--font-plex-arabic), system-ui, sans-serif;
   --font-heading: var(--font-readex), sans-serif;
 }
