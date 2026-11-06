@@ -30,7 +30,6 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm test
       # The Neon migration runner, tried on a throwaway Postgres 18: apply,
       # then run again to prove a second run changes nothing.
       - name: Migration runner works on a real database
@@ -39,6 +38,10 @@ jobs:
         run: |
           npm run db:migrate
           npm run db:migrate -- --dry-run | grep -q "No pending migrations."
+      # Unit tests, including agency data isolation (RLS) on the migrated database.
+      - run: npm test
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/signo
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
